@@ -1,1 +1,1 @@
-export const MODULE_ID = "pf2e-wayfinder";
+export const MODULE_ID = "pf2e-compass";

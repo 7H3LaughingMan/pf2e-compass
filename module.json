@@ -1,12 +1,11 @@
 {
-    "id": "pf2e-wayfinder",
-    "title": "PF2e Wayfinder",
+    "id": "pf2e-compass",
+    "title": "PF2e Compass",
     "description": "This module allows you to display a ruler when dragging a token that will show you how far you've moved that token.",
     "version": "6.1.0",
     "compatibility": {
         "minimum": "12.328",
-        "verified": "12.328",
-        "maximum": "12.999"
+        "verified": "12"
     },
     "authors": [
         {
