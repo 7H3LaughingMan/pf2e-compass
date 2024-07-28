@@ -1,30 +1,95 @@
 import { MODULE_ID } from "./const.js";
+import { Wayfinder } from "../wasm/pf2e-astar.js"
 
 export function wrapRuler() {
-    libWrapper.register(MODULE_ID, "CONFIG.Canvas.rulerClass.prototype.measure", measure, "MIXED");
-}
+    libWrapper.register(MODULE_ID, "CONFIG.Canvas.rulerClass.prototype._startMeasurement", function (wrapped, origin, { snap = true, token } = {}) {
+        if (this.state !== Ruler.STATES.INACTIVE) return;
 
-function measure(wrapped, destination, { snap = true, force = false } = {}) {
-    if (!this.dragMeasurement || !snap) {
-        return wrapped(destination, { snap, force });
-    }
+        this.wayfinder = new Wayfinder(token);
+        wrapped(origin, { snap, token });
+    });
 
-    if ( this.state !== Ruler.STATES.MEASURING ) return;
+    libWrapper.register(MODULE_ID, "CONFIG.Canvas.rulerClass.prototype._endMeasurement", function (wrapped) {
+        if (this.state !== Ruler.STATES.MEASURING) return;
 
-    // Compute the measurement destination, segments, and distance
-    const d = this._getMeasurementDestination(destination, {snap});
-    if ( this.destination && (d.x === this.destination.x) && (d.y === this.destination.y) && !force ) return;
-    this.destination = d;
-    this.segments = this._getMeasurementSegments();
-    this._computeDistance();
-    this._broadcastMeasurement();
+        this.wayfinder = null;
+        wrapped();
+    });
 
-    // Draw the ruler graphic
-    this.ruler.clear();
-    this._drawMeasuredPath();
+    libWrapper.register(MODULE_ID, "CONFIG.Canvas.rulerClass.prototype._getMeasurementDestination", function (wrapped, point, { snap = true } = {}) {
+        let destination = wrapped(point, { snap });
 
-    // Draw grid highlight
-    this.highlightLayer.clear();
-    for ( const segment of this.segments ) this._highlightMeasurementSegment(segment);
-    return this.segments;
+        if (this.token && this.wayfinder && game.settings.get(MODULE_ID, "enablePathfinding")) {
+            let path = this.wayfinder.findPath(this.waypoints[this.waypoints.length - 1], destination);
+            if (path && path.length > 1) {
+                destination.path = path;
+            }
+        }
+
+        return destination;
+    });
+
+    libWrapper.register(MODULE_ID, "CONFIG.Canvas.rulerClass.prototype._getMeasurementSegments", function (wrapped) {
+        const segments = [];
+        const path = [];
+
+        for (let element of this.history) {
+            if (Object.hasOwn(element, "path")) {
+                if (path.length == 0) {
+                    path.push(...element.path);
+                } else {
+                    const pathAddition = element.path.slice(1);
+                    path.push(...pathAddition);
+                }
+            } else {
+                path.push(element);
+            }
+        }
+
+        for (let element of this.waypoints) {
+            if (Object.hasOwn(element, "path")) {
+                if (path.length == 0) {
+                    path.push(...element.path);
+                } else {
+                    const pathAddition = element.path.slice(1);
+                    path.push(...pathAddition);
+                }
+            } else {
+                path.push(element);
+            }
+        }
+
+        if (Object.hasOwn(this.destination, "path")) {
+            const pathAddition = this.destination.path.slice(1);
+            path.push(...pathAddition);
+        } else {
+            path.push(this.destination);
+        }
+
+        for (let i = 1; i < path.length; i++) {
+            const label = this.labels.children.at(i - 1) ?? this.labels.addChild(new PreciseText("", CONFIG.canvasTextStyle));
+            const history = i < this.history.length;
+            const first = i === this.history.length;
+            const ray = new Ray(path[i - 1], path[i]);
+            segments.push({
+                ray,
+                teleport: history ? path[i].teleport : first && (i > 0) && (ray.distance > 0),
+                label,
+                distance: 0,
+                cost: 0,
+                cumulativeDistance: 0,
+                cumulativeCost: 0,
+                history,
+                first,
+                last: i === path.length - 1,
+                animation: {}
+            });
+        }
+
+        if (this.labels.children.length > segments.length) {
+            this.labels.removeChildren(segments.length).forEach(c => c.destroy());
+        }
+
+        return segments;
+    });
 }

@@ -2,10 +2,16 @@ import { MODULE_ID } from "./const.js";
 import { registerSettings } from "./settings.js";
 import { registerKeybindings } from "./keybindings.js";
 import { wrapRuler } from "./ruler.js";
+import init, { Wayfinder } from "../wasm/pf2e-astar.js"
 
 Hooks.once("init", () => {
     registerSettings();
     registerKeybindings();
+
+    init();
+    window.pf2eCompass = {
+        Wayfinder
+    };
 });
 
 Hooks.once("ready", () => {
@@ -14,7 +20,7 @@ Hooks.once("ready", () => {
 
 Hooks.on("getSceneControlButtons", function (controls) {
     if (!canvas.scene) return;
-    
+
     const tokenControls = controls.find(c => c.name === "token");
     const rulerIndex = tokenControls.tools.findIndex(t => t.name === "ruler");
 
