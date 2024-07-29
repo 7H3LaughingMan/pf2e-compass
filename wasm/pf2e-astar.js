@@ -414,6 +414,10 @@ function __wbg_get_imports() {
     imports.wbg.__wbg_set_d4638f722068f043 = function(arg0, arg1, arg2) {
         getObject(arg0)[arg1 >>> 0] = takeObject(arg2);
     };
+    imports.wbg.__wbg_at_dfc409d8598957a0 = function(arg0, arg1) {
+        const ret = getObject(arg0).at(arg1);
+        return isLikeNone(ret) ? 0xFFFFFF : ret;
+    };
     imports.wbg.__wbindgen_error_new = function(arg0, arg1) {
         const ret = new Error(getStringFromWasm0(arg0, arg1));
         return addHeapObject(ret);
