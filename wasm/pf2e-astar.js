@@ -230,6 +230,20 @@ export class Wayfinder {
         return this;
     }
     /**
+    * @param {Uint8Array} pixels
+    * @param {any} bounds
+    */
+    addVision(pixels, bounds) {
+        wasm.wayfinder_addVision(this.__wbg_ptr, addHeapObject(pixels), addHeapObject(bounds));
+    }
+    /**
+    * @param {Uint8Array} pixels
+    * @param {any} bounds
+    */
+    addExplored(pixels, bounds) {
+        wasm.wayfinder_addExplored(this.__wbg_ptr, addHeapObject(pixels), addHeapObject(bounds));
+    }
+    /**
     * @param {any} start
     * @param {any} end
     * @returns {any}
@@ -277,7 +291,7 @@ function __wbg_get_imports() {
     imports.wbg.__wbindgen_object_drop_ref = function(arg0) {
         takeObject(arg0);
     };
-    imports.wbg.__wbg_static_accessor_GAME_a601afa63b3781f7 = function() {
+    imports.wbg.__wbg_static_accessor_GAME_d617293631ddd392 = function() {
         const ret = game;
         return addHeapObject(ret);
     };
@@ -330,16 +344,16 @@ function __wbg_get_imports() {
         const ret = +getObject(arg0);
         return ret;
     };
+    imports.wbg.__wbindgen_boolean_get = function(arg0) {
+        const v = getObject(arg0);
+        const ret = typeof(v) === 'boolean' ? (v ? 1 : 0) : 2;
+        return ret;
+    };
     imports.wbg.__wbindgen_number_get = function(arg0, arg1) {
         const obj = getObject(arg1);
         const ret = typeof(obj) === 'number' ? obj : undefined;
         getFloat64Memory0()[arg0 / 8 + 1] = isLikeNone(ret) ? 0 : ret;
         getInt32Memory0()[arg0 / 4 + 0] = !isLikeNone(ret);
-    };
-    imports.wbg.__wbindgen_boolean_get = function(arg0) {
-        const v = getObject(arg0);
-        const ret = typeof(v) === 'boolean' ? (v ? 1 : 0) : 2;
-        return ret;
     };
     imports.wbg.__wbg_new_abda76e883ba8a5f = function() {
         const ret = new Error();

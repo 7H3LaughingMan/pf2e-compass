@@ -1,3 +1,10 @@
+# 6.1.0
+
+- Adds support for Token Vision & Fog Exploration.
+  - If Token Vision is enabled for a scene it will not find a path going through squares that are not visible.
+  - If Fog Exploration is enabled for a scene it will not find a path going through squares that haven't been explored.
+  - If both are enabled then it will not find a path going through squares that are not visible and haven't been explored.
+
 # 6.0.0
 
 Initial Release! This is the successor to PF2e Token Drag Ruler and adds pathfinding capabilities to the token drag measurement tool added to the PF2e System.

@@ -6,6 +6,25 @@ export function wrapRuler() {
         if (this.state !== Ruler.STATES.INACTIVE) return;
 
         this.wayfinder = new Wayfinder(token);
+
+        if (canvas.scene.tokenVision) {
+            let vision_pixels = canvas.app.renderer.extract.pixels(canvas.visibility.vision);
+            let vision_bounds = canvas.visibility.vision.getLocalBounds();
+
+            if (vision_bounds.width !== 0 && vision_bounds.height !== 0) {
+                this.wayfinder.addVision(vision_pixels, vision_bounds);
+            }
+        }
+
+        if (canvas.scene.fog.exploration) {
+            let explored_pixels = canvas.app.renderer.extract.pixels(canvas.visibility.explored);
+            let explored_bounds = canvas.visibility.explored.getLocalBounds();
+
+            if (explored_bounds.width !== 0 && explored_bounds.height !== 0) {
+                this.wayfinder.addVision(explored_pixels, explored_bounds);
+            }
+        }
+
         wrapped(origin, { snap, token });
     });
 
