@@ -1,3 +1,7 @@
+# 6.2.1
+
+- Fixes a small problem with the localization.
+
 # 6.2.0
 
 - Removed support for Token Vision on a scene, was causing issues with performance and pathfinding.
