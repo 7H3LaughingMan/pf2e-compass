@@ -5,15 +5,22 @@ export function wrapRuler() {
     libWrapper.register(MODULE_ID, "CONFIG.Canvas.rulerClass.prototype._startMeasurement", function (wrapped, origin, { snap = true, token } = {}) {
         if (this.state !== Ruler.STATES.INACTIVE) return;
 
-        if (game.settings.get(MODULE_ID, "enablePathfinding")) {
+        if (game.settings.get(MODULE_ID, "enablePathfinding") && token) {
             this.wayfinder = new Wayfinder(token);
 
-            if (canvas.scene.fog.exploration) {
-                let explored_pixels = canvas.app.renderer.extract.pixels(canvas.visibility.explored);
-                let explored_bounds = canvas.visibility.explored.getLocalBounds();
+            if (canvas.scene.fog.exploration && game.settings.get(MODULE_ID, "fogExploration")) {
+                if (!game.settings.get("pf2e", "gmVision") && token.document.sight.enabled) {
+                    let sceneRect = canvas.dimensions.sceneRect;
+                    let scaledRect = new PIXI.Rectangle(sceneRect.x * 0.05, sceneRect.y * 0.05, sceneRect.width * 0.05, sceneRect.height * 0.05);
 
-                if (explored_bounds.width !== 0 && explored_bounds.height !== 0) {
-                    this.wayfinder.addExplored(explored_pixels, explored_bounds);
+                    let renderTexture = PIXI.RenderTexture.create({ width: scaledRect.width, height: scaledRect.height });
+                    let transform = new PIXI.Matrix(0.05, 0, 0, 0.05, -(scaledRect.x), -(scaledRect.y));
+                    canvas.app.renderer.render(canvas.visibility.explored, { renderTexture, transform });
+
+                    let explored_pixels = canvas.app.renderer.extract.pixels(renderTexture);
+                    let explored_bounds = canvas.visibility.explored.getLocalBounds();
+
+                    this.wayfinder.addExplored(explored_pixels, explored_bounds, scaledRect);
                 }
             }
         }
@@ -33,8 +40,11 @@ export function wrapRuler() {
 
         if (this.token && this.wayfinder && game.settings.get(MODULE_ID, "enablePathfinding")) {
             let path = this.wayfinder.findPath(this.waypoints[this.waypoints.length - 1], destination);
+
             if (path && path.length > 1) {
                 destination.path = path;
+            } else {
+                delete destination.path;
             }
         }
 

@@ -1,3 +1,11 @@
+# 6.2.0
+
+- Removed support for Token Vision on a scene, was causing issues with performance and pathfinding.
+- When retrieving the Fog Exploration overlay it now scales it down to 5%, this is to prevent performance issues when you start dragging a token. There might still be a slight stutter on stupidly big maps.
+- Added a setting for enforcing Fog Exploration when pathfinding.
+- If GM Vision is enabled or if a token doesn't have vision enabled it will ignore fog exploration. Make sure your player's tokens have vision enabled!
+- Lastly, fixed an issue where tiny creatures weren't defaulting to the same token space as small/medium creatures.
+
 # 6.1.0
 
 - Adds support for Token Vision & Fog Exploration.
