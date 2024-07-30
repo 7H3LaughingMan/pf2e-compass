@@ -1,3 +1,7 @@
+# 6.2.2
+
+- Fixes a small problem where it wasn't calculating distances properly.
+
 # 6.2.1
 
 - Fixes a small problem with the localization.
