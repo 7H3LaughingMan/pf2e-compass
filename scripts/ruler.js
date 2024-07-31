@@ -1,5 +1,6 @@
 import { MODULE_ID } from "./const.js";
 import { Wayfinder } from "../wasm/pf2e-astar.js"
+import { getPath } from "./util.js";
 
 export function wrapRuler() {
     libWrapper.register(MODULE_ID, "CONFIG.Canvas.rulerClass.prototype._startMeasurement", function (wrapped, origin, { snap = true, token } = {}) {
@@ -39,7 +40,7 @@ export function wrapRuler() {
         let destination = wrapped(point, { snap });
 
         if (this.token && this.wayfinder && game.settings.get(MODULE_ID, "enablePathfinding")) {
-            let path = this.wayfinder.findPath(this.waypoints[this.waypoints.length - 1], destination);
+            let path = this.wayfinder.findPath(getPath(this.history, this.waypoints), destination);
 
             if (path && path.length > 1) {
                 destination.path = path;
@@ -53,40 +54,7 @@ export function wrapRuler() {
 
     libWrapper.register(MODULE_ID, "CONFIG.Canvas.rulerClass.prototype._getMeasurementSegments", function (wrapped) {
         const segments = [];
-        const path = [];
-
-        for (let element of this.history) {
-            if (Object.hasOwn(element, "path")) {
-                if (path.length == 0) {
-                    path.push(...element.path);
-                } else {
-                    const pathAddition = element.path.slice(1);
-                    path.push(...pathAddition);
-                }
-            } else {
-                path.push(element);
-            }
-        }
-
-        for (let element of this.waypoints) {
-            if (Object.hasOwn(element, "path")) {
-                if (path.length == 0) {
-                    path.push(...element.path);
-                } else {
-                    const pathAddition = element.path.slice(1);
-                    path.push(...pathAddition);
-                }
-            } else {
-                path.push(element);
-            }
-        }
-
-        if (Object.hasOwn(this.destination, "path")) {
-            const pathAddition = this.destination.path.slice(1);
-            path.push(...pathAddition);
-        } else {
-            path.push(this.destination);
-        }
+        const path = getPath(this.history, this.waypoints, this.destination);
 
         for (let i = 1; i < path.length; i++) {
             const label = this.labels.children.at(i - 1) ?? this.labels.addChild(new PreciseText("", CONFIG.canvasTextStyle));

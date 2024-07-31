@@ -1,3 +1,7 @@
+# 6.3.0
+
+- Now checks the history and waypoints to determine where on the 5-10-5 diagonal rule it's currently at before it tries to find a path.
+
 # 6.2.3
 
 - Removed some debug logging that made it in by mistake.
