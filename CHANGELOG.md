@@ -1,3 +1,7 @@
+# 6.2.3
+
+- Removed some debug logging that made it in by mistake.
+
 # 6.2.2
 
 - Fixes a small problem where it wasn't calculating distances properly.
