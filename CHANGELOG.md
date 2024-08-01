@@ -1,3 +1,7 @@
+# 6.4.1
+
+- Added a macro that can be used to export an image of the Fog Exploration.
+
 # 6.4.0
 
 - When trying to find a path on a SquareGrid it will attempt to try and follow a direct path if possible.
