@@ -1,3 +1,7 @@
+# 6.4.0
+
+- When trying to find a path on a SquareGrid it will attempt to try and follow a direct path if possible.
+
 # 6.3.0
 
 - Now checks the history and waypoints to determine where on the 5-10-5 diagonal rule it's currently at before it tries to find a path.
